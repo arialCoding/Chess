@@ -16,6 +16,15 @@ typedef struct{
 } Handler;
 
 int HL_Init(const char* title, int w, int h, Handler* handler);
+
 void HL_HandleEvents(Handler* handler);
+
+void HL_ClearRenderer(Handler* handler);
+void HL_PresentRenderer(Handler* handler);
+
+SDL_Texture* HL_LoadTexture(const char* path, Handler* handler);
+
 void HL_CleanUp(Handler* handler);
+
+
 #endif //HANDLER_H
