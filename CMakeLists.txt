@@ -8,7 +8,7 @@ find_package(SDL2_image REQUIRED)
 set (sourceDir ${CMAKE_CURRENT_SOURCE_DIR}/source)
 set (includeDir ${sourceDir}/include)
 set (DEPENDENCIES_LINK_LIBS SDL2::SDL2 SDL2_image)
-set (LOCAL_LINK_LIBS Handler)
+set (LOCAL_LINK_LIBS Handler App)
 
 add_subdirectory(${sourceDir})
 
