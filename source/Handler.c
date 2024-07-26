@@ -58,6 +58,14 @@ void HL_HandleEvents(Handler* handler)
                 handler->input[handler->event.key.keysym.scancode] = 1;
                 break;
 
+            case SDL_MOUSEBUTTONDOWN:
+                handler->mouse[handler->event.button.button - 1] = 1;
+                break;
+
+            case SDL_MOUSEBUTTONUP:
+                handler->mouse[handler->event.button.button - 1] = 0;
+                break;
+
             default:
                 break;
         }

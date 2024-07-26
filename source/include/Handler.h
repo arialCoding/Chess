@@ -12,6 +12,7 @@ typedef struct{
     SDL_Renderer* renderer;
     SDL_Event event;
     uint8_t input[256];
+    uint8_t mouse[3];
     uint8_t running;
 } Handler;
 

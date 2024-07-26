@@ -1,24 +1,19 @@
 #include "App.h"
 #include "Handler.h"
 
-static const unsigned int SCREEN_WIDTH = 640;
-static const unsigned int SCREEN_HEIGHT = 640;
+#include "Board.h"
+
+static const unsigned int SCREEN_WIDTH = 83*8;
+static const unsigned int SCREEN_HEIGHT = 83*8;
 
 Handler handler;
 
-SDL_Texture* board;
-SDL_Rect src = {0, 0, 8, 8};
+Board board;
 
 void Run()
 {
-    if(!HL_Init("Chess", SCREEN_WIDTH, SCREEN_HEIGHT, &handler))
-    {
-        printf("failed creating handler!\n");
-        return;
-    }
-
-    board = HL_LoadTexture("resource/board.png", &handler);
-
+    Init();
+    
     float dt = 0.f;
     int frameStart = 0;
 
@@ -35,15 +30,29 @@ void Run()
 
 }
 
+void Init()
+{
+    if(!HL_Init("Chess", SCREEN_WIDTH, SCREEN_HEIGHT, &handler))
+    {
+        printf("failed creating handler!\n");
+        return;
+    }
+
+    initBoard(&board, &handler);
+
+}
+
 void Update(float dt)
 {
     HL_HandleEvents(&handler);
+
+    updateBoard(&board, &handler);
 }
 void Render()
 {
     HL_ClearRenderer(&handler);
-
-    SDL_RenderCopy(handler.renderer, board, &src, NULL);
+    
+    drawBoard(&board, &handler);
 
     HL_PresentRenderer(&handler);
 }
