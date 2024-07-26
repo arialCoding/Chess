@@ -2,20 +2,21 @@ cmake_minimum_required(VERSION 3.20)
 
 project(chess)
 
-find_package(SDL2 REQUIRED)
-find_package(SDL2_image REQUIRED)
+set (SDL2_dir ${CMAKE_SOURCE_DIR}/vendor/SDL2)
 
 set (sourceDir ${CMAKE_CURRENT_SOURCE_DIR}/source)
-set (includeDir ${sourceDir}/include)
-set (DEPENDENCIES_LINK_LIBS SDL2::SDL2 SDL2_image)
+set (includeDir ${sourceDir}/include ${SDL2_dir}/include)
+set (DEPENDENCIES_LINK_LIBS SDL2main SDL2 SDL2_image)
 set (LOCAL_LINK_LIBS Handler App)
+
+link_directories(${SDL2_dir}/lib)
 
 add_library(Handler ${sourceDir}/Handler.c)
 target_include_directories(Handler PUBLIC ${includeDir})
 target_link_libraries(Handler PUBLIC ${DEPENDENCIES_LINK_LIBS})
 
 set (AppSources ${sourceDir}/App.c
-                ${sourceDir}/Board.c)
+                ${sourceDir}/Game.c)
 
 add_library(App ${AppSources})
 target_include_directories(App PUBLIC ${includeDir})    

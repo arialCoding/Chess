@@ -3,6 +3,7 @@
 
 #include "Handler.h"
 
+//pieces
 enum {
     EMPTY,
     KING,
@@ -13,6 +14,7 @@ enum {
     PAWN
 };
 
+//teams
 enum {
     NONE,
     WHITE,
@@ -21,13 +23,8 @@ enum {
 
 typedef struct
 {
-    SDL_Texture* PiecesTex;
-
     uint8_t type;
     uint8_t team;
-
-    SDL_Rect src;
-    SDL_Rect dest;
 
 }Cell;
 
@@ -37,11 +34,12 @@ typedef struct
 
     SDL_Rect boardSrc;
 
-    uint8_t board[8][8];
-    Cell cells[64];
+    Cell board[8][8];
 }Board;
 
 void initBoard(Board* board, Handler* handler);
+
+void resetBoard(Board* board);
 
 void updateBoard(Board* board, Handler* handler);
 

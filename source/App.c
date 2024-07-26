@@ -1,7 +1,7 @@
 #include "App.h"
 #include "Handler.h"
 
-#include "Board.h"
+#include "Game.h"
 
 static const unsigned int SCREEN_WIDTH = 83*8;
 static const unsigned int SCREEN_HEIGHT = 83*8;
