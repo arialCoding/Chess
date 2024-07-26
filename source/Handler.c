@@ -30,10 +30,10 @@ int HL_Init(const char* title, int w, int h, Handler* handler)
         return 0;    
     }
 
-    for(int i = 0; i < 256; i++)
-    {
-        handler->input[i] = 0;
-    }
+    memset(handler->input, 0, sizeof(handler->input));
+
+    handler->RMBpressed = handler->LMBpressed = handler->MMBpressed = 0;
+    handler->RMBreleased = handler->LMBreleased = handler->MMBreleased = 0;
 
     handler->running = 1;
 
@@ -42,6 +42,10 @@ int HL_Init(const char* title, int w, int h, Handler* handler)
 
 void HL_HandleEvents(Handler* handler)
 {
+    handler->LMBreleased = 0;
+    handler->RMBreleased = 0;
+    handler->MMBreleased = 0;
+
     while(SDL_PollEvent(&handler->event))
     {
         switch (handler->event.type)
@@ -55,15 +59,38 @@ void HL_HandleEvents(Handler* handler)
                 break;
 
             case SDL_KEYUP:
-                handler->input[handler->event.key.keysym.scancode] = 1;
+                handler->input[handler->event.key.keysym.scancode] = 0;
                 break;
 
             case SDL_MOUSEBUTTONDOWN:
-                handler->mouse[handler->event.button.button - 1] = 1;
+                if(handler->event.button.button == SDL_BUTTON_LEFT)
+                    handler->LMBpressed = 1;
+                else if(handler->event.button.button == SDL_BUTTON_RIGHT)
+                    handler->RMBpressed = 1;
+                else if(handler->event.button.button == SDL_BUTTON_MIDDLE)
+                    handler->MMBpressed = 1;
+                handler->mouseX = handler->event.button.x;
+                handler->mouseY = handler->event.button.y;
                 break;
 
-            case SDL_MOUSEBUTTONUP:
-                handler->mouse[handler->event.button.button - 1] = 0;
+            case SDL_MOUSEBUTTONUP:                
+                if(handler->event.button.button == SDL_BUTTON_LEFT)
+                {
+                    handler->LMBpressed = 0;
+                    handler->LMBreleased = 1;
+                }
+                else if(handler->event.button.button == SDL_BUTTON_LEFT)
+                {
+                    handler->LMBpressed = 0;
+                    handler->LMBreleased = 1;
+                }
+                else if(handler->event.button.button == SDL_BUTTON_LEFT)
+                {
+                    handler->LMBpressed = 0;
+                    handler->LMBreleased = 1;
+                }
+                handler->mouseX = handler->event.button.x;
+                handler->mouseY = handler->event.button.y;
                 break;
 
             default:

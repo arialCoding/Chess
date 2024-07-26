@@ -22,7 +22,8 @@ target_include_directories(Handler PUBLIC ${includeDir})
 target_link_libraries(Handler PUBLIC ${DEPENDENCIES_LINK_LIBS})
 
 set (AppSources ${sourceDir}/App.c
-                ${sourceDir}/Game.c)
+                ${sourceDir}/Game.c
+                ${sourceDir}/Logic.c)
 
 add_library(App ${AppSources})
 target_include_directories(App PUBLIC ${includeDir})    

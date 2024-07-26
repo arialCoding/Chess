@@ -1,10 +1,11 @@
 #include "Game.h"
+#include "Logic.h"
 
 #define PIECE_SIZE 83
 
 SDL_Texture* piecesTextureSheet;
 
-
+/*
 static void printBoard(Cell board[8][8])
 {
     for(int i = 0; i < 8; i++)
@@ -16,7 +17,7 @@ static void printBoard(Cell board[8][8])
         printf("\n");
     }
 }
-
+*/
 
 void initBoard(Board* board, Handler* handler)
 {
@@ -32,7 +33,7 @@ void initBoard(Board* board, Handler* handler)
 
     piecesTextureSheet = HL_LoadTexture("resource/pieces.png", handler);
 
-    printBoard(board->board);
+    //printBoard(board->board);
 
 }
 
@@ -71,20 +72,38 @@ void resetBoard(Board* board)
     }
 }
 
-static void refreshBoard(Board* board)
-{
-    uint8_t row = 0, col = 0;
-    for(int i = 0; i < 64; i++)
-    {
-        row = i/8;
-        col = i%8;
-    
-    }
-}
+static int mousePressedX;
+static int mousePressedY;
+static uint8_t gotMousePressingPos = 0;
+
+static int mouseReleasedX;
+static int mouseReleasedY;
+static uint8_t gotMouseReleasingPos = 0;
 
 void updateBoard(Board* board, Handler* handler)
 {
-   
+
+
+    if(handler->LMBpressed)
+    {
+        mousePressedX = handler->mouseX;
+        mousePressedY = handler->mouseY;
+        gotMousePressingPos = 1;
+    }
+    if(handler->LMBreleased)
+    {
+        mouseReleasedX = handler->mouseX;
+        mouseReleasedY = handler->mouseY;
+        gotMouseReleasingPos = 1;
+    }
+
+    if(gotMousePressingPos && gotMouseReleasingPos)
+    {
+        gotMousePressingPos = 0;
+        gotMouseReleasingPos = 0;
+        handleMovement(board, mousePressedX, mousePressedY, mouseReleasedX, mouseReleasedY);
+    }
+
 }
 
 static SDL_Rect src, dest;

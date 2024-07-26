@@ -46,6 +46,9 @@ void Update(float dt)
 {
     HL_HandleEvents(&handler);
 
+    if(handler.input[SDL_SCANCODE_R])
+        resetBoard(&board);
+
     updateBoard(&board, &handler);
 }
 void Render()

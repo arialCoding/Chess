@@ -12,8 +12,19 @@ typedef struct{
     SDL_Renderer* renderer;
     SDL_Event event;
     uint8_t input[256];
-    uint8_t mouse[3];
     uint8_t running;
+
+    int mouseX;
+    int mouseY;
+
+    uint8_t LMBpressed;
+    uint8_t RMBpressed;
+    uint8_t MMBpressed;
+
+    uint8_t LMBreleased;
+    uint8_t RMBreleased;
+    uint8_t MMBreleased;
+
 } Handler;
 
 int HL_Init(const char* title, int w, int h, Handler* handler);
