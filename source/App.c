@@ -10,6 +10,7 @@ Handler handler;
 
 Board board;
 
+//the main game loop
 void Run()
 {
     Init();
