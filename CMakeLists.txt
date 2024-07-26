@@ -2,14 +2,20 @@ cmake_minimum_required(VERSION 3.20)
 
 project(chess)
 
-set (SDL2_dir ${CMAKE_SOURCE_DIR}/vendor/SDL2)
+if(WIN32)
+    set (SDL2_dir ${CMAKE_SOURCE_DIR}/vendor/SDL2)
+    link_directories(${SDL2_dir}/lib)
+    set (includeDir ${SDL2_dir}/include)
+else()
+    find_package(SDL2 REQUIRED)
+    find_package(SDL2_image REQUIRED)
+endif()
 
 set (sourceDir ${CMAKE_CURRENT_SOURCE_DIR}/source)
-set (includeDir ${sourceDir}/include ${SDL2_dir}/include)
+set (includeDir ${includeDir} ${sourceDir}/include)
 set (DEPENDENCIES_LINK_LIBS SDL2main SDL2 SDL2_image)
 set (LOCAL_LINK_LIBS Handler App)
 
-link_directories(${SDL2_dir}/lib)
 
 add_library(Handler ${sourceDir}/Handler.c)
 target_include_directories(Handler PUBLIC ${includeDir})
