@@ -5,19 +5,20 @@
 
 SDL_Texture* piecesTextureSheet;
 
-/*
+
 static void printBoard(Cell board[8][8])
 {
+    system("cls");
     for(int i = 0; i < 8; i++)
     {
         for(int j = 0; j < 8; j++)
         {
-            printf("(%i , %i);", board[i][j].type, board[i][j].team);
+            printf("(%i , %i);", board[i][j].controlledByWhite, board[i][j].controlledByBlack);
         }
         printf("\n");
     }
 }
-*/
+
 
 void initBoard(Board* board, Handler* handler)
 {
@@ -103,6 +104,10 @@ void updateBoard(Board* board, Handler* handler)
         gotMouseReleasingPos = 0;
         handleMovement(board, mousePressedX, mousePressedY, mouseReleasedX, mouseReleasedY);
     }
+
+    setControlledCells(board);
+
+    printBoard(board->board);
 
 }
 

@@ -4,7 +4,7 @@
 #include "Handler.h"
 
 //pieces
-enum {
+typedef enum {
     EMPTY,
     KING,
     QUEEN,
@@ -12,20 +12,21 @@ enum {
     KNIGHT,
     ROOK,
     PAWN
-};
+}pieces;
 
 //teams
-enum {
+typedef enum {
     NONE,
     WHITE,
     BLACK
-};
+}teams;
 
 typedef struct
 {
-    uint8_t type;
-    uint8_t team;
-
+    pieces type;
+    teams team;
+    uint8_t controlledByWhite;
+    uint8_t controlledByBlack;
 }Cell;
 
 typedef struct
