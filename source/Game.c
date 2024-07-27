@@ -107,7 +107,7 @@ void updateBoard(Board* board, Handler* handler)
 
     setControlledCells(board);
 
-    printBoard(board->board);
+    //printBoard(board->board);
 
 }
 
