@@ -183,9 +183,31 @@ uint8_t bichopMoveValid(Board* board, int srcCol, int srcRow, int destCol, int d
 uint8_t rookMoveValid(Board* board, int srcCol, int srcRow, int destCol, int destRow)
 {
     //printf("called rook\n");
+    if(srcRow != destRow && srcCol != destCol)
+        return 0;
+
+    if(srcRow == destRow)
+    {
+        int i = (srcCol < destCol) ? srcCol + 1 : destCol + 1;
+        int end = (srcCol > destCol) ? srcCol : destCol;
+        for(i = i; i < end; i++)
+        {
+            if(board->board[srcRow][i].type != EMPTY)
+                return 0;
+        }
+    }
+   if(srcCol == destCol)
+    {
+        int i = (srcRow < destRow) ? srcRow + 1 : destRow + 1;
+        int end = (srcRow > destRow) ? srcRow : destRow;
+        for(i = i; i < end; i++)
+        {
+            if(board->board[i][srcCol].type != EMPTY)
+                return 0;
+        }
+    }
 
     return 1;
-
 }
 
   /////////////////////////////////////////////////////////////////////////////////////
@@ -265,7 +287,15 @@ void queenSetControlledSquares(Board* board, teams team, int pieceCol, int piece
 
 void knightSetControlledSquares(Board* board, teams team, int pieceCol, int pieceRow)
 {
-
+    for(int i = 0; i < 8; i++)
+    {
+        if(pieceRow + knightMoves[i][0] <= 7 && pieceRow + knightMoves[i][0] >= 0)
+            if(pieceCol + knightMoves[i][1] <= 7 && pieceCol + knightMoves[i][1] >= 0)
+                if(team == WHITE)
+                    board->board[pieceRow + knightMoves[i][0]][pieceCol + knightMoves[i][1]].controlledByWhite = 1;
+                else
+                    board->board[pieceRow + knightMoves[i][0]][pieceCol + knightMoves[i][1]].controlledByBlack = 1;
+    }
 }
 
 void bichopSetControlledSquares(Board* board, teams team, int pieceCol, int pieceRow)
@@ -275,5 +305,84 @@ void bichopSetControlledSquares(Board* board, teams team, int pieceCol, int piec
 
 void rookSetControlledSquares(Board* board, teams team, int pieceCol, int pieceRow)
 {
+    uint8_t left = 1, right = 1, top = 1, bottom = 1;
+    int i = 1;
+
+    while(left || right || top || bottom)
+    {
+        if(right)
+        {
+            if(pieceCol + i < 8)
+            {
+                if(board->board[pieceRow][pieceCol + i].type != EMPTY)
+                {
+                    if(team == WHITE)
+                        board->board[pieceRow][pieceCol + i].controlledByWhite = 1;
+                    else
+                        board->board[pieceRow][pieceCol + i].controlledByBlack = 1;
+                    right = 0;
+                }
+                else
+                    if(team == WHITE)
+                        board->board[pieceRow][pieceCol + i].controlledByWhite = 1;
+                    else
+                        board->board[pieceRow][pieceCol + i].controlledByBlack = 1;
+            }else right = 0;
+        }
+        if(left)
+        {
+            if(pieceCol - i >= 0)
+            {
+                if(board->board[pieceRow][pieceCol - i].type != EMPTY)
+                    left = 0;
+                else
+                    if(team == WHITE)
+                        board->board[pieceRow][pieceCol - i].controlledByWhite = 1;
+                    else
+                        board->board[pieceRow][pieceCol - i].controlledByBlack = 1;
+            }else left = 0;
+        }
+        if(top)
+        {
+            if(pieceRow - i >= 0)
+            {
+                if(board->board[pieceRow - i][pieceCol].type != EMPTY)
+                    top = 0;
+                else
+                    if(team == WHITE)
+                        board->board[pieceRow - i][pieceCol].controlledByWhite = 1;
+                    else
+                        board->board[pieceRow - i][pieceCol].controlledByBlack = 1;
+            }else top = 0;
+        }
+        if(bottom)
+        {
+            if(pieceRow + i < 8)
+            {
+                if(board->board[pieceRow + i][pieceCol].type != EMPTY)
+                    bottom = 0;
+                else
+                    if(team == WHITE)
+                        board->board[pieceRow + i][pieceCol].controlledByWhite = 1;
+                    else
+                        board->board[pieceRow + i][pieceCol].controlledByBlack = 1;
+            }else bottom = 0;
+        }
+        i++;
+    }
 
 }
+
+/*static const int8_t knightMoves[8][2] = {
+        { 2,  1},//bottom right
+        { 1,  2},//corners
+
+        { 2, -1},//top right
+        { 1, -2},//corners
+
+        {-2,  1},//bottom left
+        {-1,  2},//corners
+
+        {-2, -1},//top left
+        {-1, -2}//corners
+};*/

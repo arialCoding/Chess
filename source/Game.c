@@ -103,11 +103,12 @@ void updateBoard(Board* board, Handler* handler)
         gotMousePressingPos = 0;
         gotMouseReleasingPos = 0;
         handleMovement(board, mousePressedX, mousePressedY, mouseReleasedX, mouseReleasedY);
+    
+        setControlledCells(board);
+        printBoard(board->board);
     }
 
-    setControlledCells(board);
 
-    //printBoard(board->board);
 
 }
 
