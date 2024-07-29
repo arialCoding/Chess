@@ -300,9 +300,8 @@ void knightSetControlledSquares(Board* board, teams team, int pieceCol, int piec
 
 void bichopSetControlledSquares(Board* board, teams team, int pieceCol, int pieceRow)
 {
-
+   
 }
-
 void rookSetControlledSquares(Board* board, teams team, int pieceCol, int pieceRow)
 {
     uint8_t left = 1, right = 1, top = 1, bottom = 1;
@@ -334,7 +333,13 @@ void rookSetControlledSquares(Board* board, teams team, int pieceCol, int pieceR
             if(pieceCol - i >= 0)
             {
                 if(board->board[pieceRow][pieceCol - i].type != EMPTY)
+                {
+                    if(team == WHITE)
+                        board->board[pieceRow][pieceCol - i].controlledByWhite = 1;
+                    else
+                        board->board[pieceRow][pieceCol - i].controlledByBlack = 1;
                     left = 0;
+                }
                 else
                     if(team == WHITE)
                         board->board[pieceRow][pieceCol - i].controlledByWhite = 1;
@@ -347,7 +352,13 @@ void rookSetControlledSquares(Board* board, teams team, int pieceCol, int pieceR
             if(pieceRow - i >= 0)
             {
                 if(board->board[pieceRow - i][pieceCol].type != EMPTY)
+                {
+                    if(team == WHITE)
+                        board->board[pieceRow - i][pieceCol].controlledByWhite = 1;
+                    else
+                        board->board[pieceRow - i][pieceCol].controlledByBlack = 1;
                     top = 0;
+                }
                 else
                     if(team == WHITE)
                         board->board[pieceRow - i][pieceCol].controlledByWhite = 1;
@@ -360,7 +371,13 @@ void rookSetControlledSquares(Board* board, teams team, int pieceCol, int pieceR
             if(pieceRow + i < 8)
             {
                 if(board->board[pieceRow + i][pieceCol].type != EMPTY)
+                {
+                    if(team == WHITE)
+                        board->board[pieceRow + i][pieceCol].controlledByWhite = 1;
+                    else
+                        board->board[pieceRow + i][pieceCol].controlledByBlack = 1;
                     bottom = 0;
+                }
                 else
                     if(team == WHITE)
                         board->board[pieceRow + i][pieceCol].controlledByWhite = 1;

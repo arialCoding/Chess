@@ -105,7 +105,7 @@ void updateBoard(Board* board, Handler* handler)
         handleMovement(board, mousePressedX, mousePressedY, mouseReleasedX, mouseReleasedY);
     
         setControlledCells(board);
-        printBoard(board->board);
+        //printBoard(board->board);
     }
 
 
