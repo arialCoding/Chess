@@ -27,23 +27,6 @@ void handleMovement(Board* board, int mousePressedX, int mousePressedY, int mous
     int destRow = mouseReleasedY / 83;
     int destCol = mouseReleasedX / 83;
 
-    /*if(isMoveValid(board, srcCol, srcRow, destCol, destRow))
-    {
-        uint8_t selectedType = board->board[srcRow][srcCol].type;
-        uint8_t selectedTeam = board->board[srcRow][srcCol].team;
-
-        board->board[srcRow][srcCol].type = EMPTY;
-        board->board[srcRow][srcCol].team = NONE;
-
-        board->board[destRow][destCol].type = selectedType;
-        board->board[destRow][destCol].team = selectedTeam;
-
-        int temp = currentTurn;
-        currentTurn = nextTurn;
-        nextTurn = temp;
-
-    }*/
-
     if(isMoveValid(board, srcCol, srcRow, destCol, destRow))
     {
         Board testBoard = *board;
@@ -238,7 +221,7 @@ uint8_t kingMoveValid(Board* board, int srcCol, int srcRow, int destCol, int des
         return 0;
 
     //can only move one square
-    if(abs(destCol - srcCol) == 1 || abs(destRow - srcRow) == 1)
+    if(abs(destCol - srcCol) <= 1 && abs(destRow - srcRow) <= 1)
         return 1;    
 
     return 0;
