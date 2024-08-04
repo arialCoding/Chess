@@ -71,6 +71,26 @@ void resetBoard(Board* board)
         board->board[6][i].team = WHITE;
         board->board[7][i].team = WHITE;
     }
+    
+
+/*///////////////////debugging pieces logic///////////////////////////
+    board->board[4][4].type = QUEEN;
+    board->board[4][4].team = WHITE;
+
+    board->board[2][4].type = QUEEN;
+    board->board[2][4].team = BLACK;
+
+    board->board[0][0].type = PAWN;
+    board->board[0][0].team = BLACK;
+    board->board[0][7].type = PAWN;
+    board->board[0][7].team = BLACK;
+
+    
+    board->board[7][0].type = PAWN;
+    board->board[7][0].team = WHITE;
+    board->board[7][7].type = PAWN;
+    board->board[7][7].team = WHITE;
+*/
 }
 
 static int mousePressedX;

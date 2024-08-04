@@ -119,16 +119,55 @@ uint8_t pawnMoveValid(Board* board, int srcCol, int srcRow, int destCol, int des
 {
     //printf("called pawn\n");
 
-    return 1;
+    //can only move if no piece is right ahead
+    if((board->board[srcRow][srcCol].team == WHITE && board->board[srcRow - 1][srcCol].type == EMPTY) ||
+       (board->board[srcRow][srcCol].team == BLACK && board->board[srcRow + 1][srcCol].type == EMPTY))
+    {
+        if((board->board[srcRow][srcCol].team == WHITE && srcRow == 6) || (board->board[srcRow][srcCol].team == BLACK && srcRow == 1))
+        {
+            if(srcCol == destCol && abs(destRow - srcRow) == 2)//allow 2 squares at first move
+                return 1;
+        }
+        
+        if(srcCol == destCol && abs(destRow - srcRow) == 1)
+        {
+            if(board->board[srcRow][srcCol].team == WHITE && destRow < srcRow)
+                return 1;
+            if(board->board[srcRow][srcCol].team == BLACK && destRow > srcRow)
+                return 1;
+            return 0;
+        }
+
+    }
+
+    if(board->board[srcRow][srcCol].team == WHITE)
+    {
+        if(destCol == srcCol + 1 && destRow == srcRow - 1)
+            return board->board[destRow][destCol].team == BLACK;
+        else if(destCol == srcCol - 1 && destRow == srcRow - 1)
+            return board->board[destRow][destCol].team == BLACK;
+    }
+
+    if(board->board[srcRow][srcCol].team == BLACK)
+    {
+        if(destCol == srcCol + 1 && destRow == srcRow + 1)
+            return board->board[destRow][destCol].team == WHITE;
+        else if(destCol == srcCol - 1 && destRow == srcRow + 1)
+            return board->board[destRow][destCol].team == WHITE;
+    }
+
+    return 0;
 }
 
 uint8_t kingMoveValid(Board* board, int srcCol, int srcRow, int destCol, int destRow)
 {
     //printf("called king\n");
+    //cant move into check (doesn't cover everything)
     if( (board->board[destRow][destCol].controlledByWhite && board->board[srcRow][srcCol].team == BLACK) ||
         (board->board[destRow][destCol].controlledByBlack && board->board[srcRow][srcCol].team == WHITE))
         return 0;
 
+    //can only move one square
     if(abs(destCol - srcCol) == 1 || abs(destRow - srcRow) == 1)
         return 1;    
 
@@ -139,9 +178,7 @@ uint8_t kingMoveValid(Board* board, int srcCol, int srcRow, int destCol, int des
 uint8_t queenMoveValid(Board* board, int srcCol, int srcRow, int destCol, int destRow)
 {
     //printf("called queen\n");
-
-    return 1;
-
+    return rookMoveValid(board, srcCol, srcRow, destCol, destRow) || bichopMoveValid(board, srcCol, srcRow, destCol, destRow);
 }
 
 static const int8_t knightMoves[8][2] = {
@@ -175,6 +212,59 @@ uint8_t knightMoveValid(Board* board, int srcCol, int srcRow, int destCol, int d
 uint8_t bichopMoveValid(Board* board, int srcCol, int srcRow, int destCol, int destRow)
 {
     //printf("called bichop\n");
+    //can only move in straight diagonals
+    if(abs(destCol - srcCol) != abs(destRow - srcRow))
+        return 0;
+
+    if(destCol > srcCol)
+    {
+        if(destRow > srcRow)
+        {
+            int startCol = srcCol + 1, startRow = srcRow + 1;
+            while(startCol < destCol && startRow < destRow)
+            {
+                if(board->board[startRow][startCol].type != EMPTY)
+                    return 0;
+                startCol++;
+                startRow++;
+            }
+        }
+        else if(destRow < srcRow)
+        {
+            int startCol = srcCol + 1, startRow = srcRow - 1;
+            while(startCol < destCol && startRow > destRow)
+            {
+                if(board->board[startRow][startCol].type != EMPTY)
+                    return 0;
+                startCol++;
+                startRow--;
+            }
+        }
+    }
+    else if(destCol < srcCol)
+    {
+        if(destRow > srcRow)
+        {
+            int startCol = srcCol - 1, startRow = srcRow + 1;
+            while(startCol > destCol && startRow < destRow)
+            {
+                if(board->board[startRow][startCol].type != EMPTY)
+                    return 0;
+                startCol--;
+                startRow++;
+            }
+        }else if(destRow < srcRow)
+        {
+            int startCol = srcCol - 1, startRow = srcRow - 1;
+            while(startCol > destCol && startRow > destRow)
+            {
+                if(board->board[startRow][startCol].type != EMPTY)
+                    return 0;
+                startCol--;
+                startRow--;
+            }
+        }
+    }
 
     return 1;
 
@@ -183,6 +273,7 @@ uint8_t bichopMoveValid(Board* board, int srcCol, int srcRow, int destCol, int d
 uint8_t rookMoveValid(Board* board, int srcCol, int srcRow, int destCol, int destRow)
 {
     //printf("called rook\n");
+    //can't move diagonally 
     if(srcRow != destRow && srcCol != destCol)
         return 0;
 
@@ -282,7 +373,8 @@ void kingSetControlledSquares(Board* board, teams team, int pieceCol, int pieceR
 
 void queenSetControlledSquares(Board* board, teams team, int pieceCol, int pieceRow)
 {
-
+    bichopSetControlledSquares(board, team, pieceCol, pieceRow);
+    rookSetControlledSquares(board, team, pieceCol, pieceRow);
 }
 
 void knightSetControlledSquares(Board* board, teams team, int pieceCol, int pieceRow)
@@ -300,8 +392,68 @@ void knightSetControlledSquares(Board* board, teams team, int pieceCol, int piec
 
 void bichopSetControlledSquares(Board* board, teams team, int pieceCol, int pieceRow)
 {
-   
+    uint8_t topRight = 1, topLeft = 1, bottomRight = 1, bottomLeft = 1;
+    int i = 1;
+
+    while(topRight || topLeft || bottomRight || bottomLeft)
+    {
+        if(topRight)
+        {
+            if(pieceCol + i <= 7 && pieceRow - i >= 0)
+            {
+                if(team == WHITE)
+                    board->board[pieceRow - i][pieceCol + i].controlledByWhite = 1;
+                else 
+                    board->board[pieceRow - i][pieceCol + i].controlledByBlack = 1;
+
+                if(board->board[pieceRow - i][pieceCol + i].type != EMPTY)
+                    topRight = 0;
+            } else topRight = 0;
+        }
+        if(topLeft)
+        {
+            if(pieceCol - i >= 0 && pieceRow - i >= 0)
+            {
+                if(team == WHITE)
+                    board->board[pieceRow - i][pieceCol - i].controlledByWhite = 1;
+                else 
+                    board->board[pieceRow - i][pieceCol - i].controlledByBlack = 1;
+
+                if(board->board[pieceRow - i][pieceCol - i].type != EMPTY)
+                    topLeft = 0;
+            } else topLeft = 0;
+        }
+        if(bottomRight)
+        {
+            if(pieceCol + i <= 7 && pieceRow + i <= 7)
+            {
+                if(team == WHITE)
+                    board->board[pieceRow + i][pieceCol + i].controlledByWhite = 1;
+                else 
+                    board->board[pieceRow + i][pieceCol + i].controlledByBlack = 1;
+
+                if(board->board[pieceRow + i][pieceCol + i].type != EMPTY)
+                    bottomRight = 0;
+            } else bottomRight = 0;
+        }
+        if(bottomLeft)
+        {
+            if(pieceCol - i >= 0 && pieceRow + i <= 7)
+            {
+                if(team == WHITE)
+                    board->board[pieceRow + i][pieceCol - i].controlledByWhite = 1;
+                else 
+                    board->board[pieceRow + i][pieceCol - i].controlledByBlack = 1;
+
+                if(board->board[pieceRow + i][pieceCol - i].type != EMPTY)
+                    bottomLeft = 0;
+            } else bottomLeft = 0;
+        }
+        i++;
+    }
+
 }
+
 void rookSetControlledSquares(Board* board, teams team, int pieceCol, int pieceRow)
 {
     uint8_t left = 1, right = 1, top = 1, bottom = 1;
