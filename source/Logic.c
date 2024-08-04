@@ -3,30 +3,100 @@
 int currentTurn = WHITE; 
 int nextTurn = BLACK; 
 
+uint8_t whiteKingRow = 7, whiteKingCol = 4;
+uint8_t blackKingRow = 0, blackKingCol = 4;
+
+static void printBoard(Cell board[8][8])
+{
+    system("cls");
+    for(int i = 0; i < 8; i++)
+    {
+        for(int j = 0; j < 8; j++)
+        {
+            printf("(%i , %i);", board[i][j].controlledByWhite, board[i][j].controlledByBlack);
+        }
+        printf("\n");
+    }
+}
+
 void handleMovement(Board* board, int mousePressedX, int mousePressedY, int mouseReleasedX, int mouseReleasedY)
 {
     //printf("pressed at (%i, %i)\nreleased at (%i, %i)\n", mousePressedX/83, mousePressedY/83, mouseReleasedX/83, mouseReleasedY/83);
-    int srcRow = mousePressedX / 83;
-    int srcCol = mousePressedY / 83;
-    int destRow = mouseReleasedX / 83;
-    int destCol = mouseReleasedY / 83;
+    int srcRow = mousePressedY / 83;
+    int srcCol = mousePressedX / 83;
+    int destRow = mouseReleasedY / 83;
+    int destCol = mouseReleasedX / 83;
 
-    if(isMoveValid(board, srcRow, srcCol, destRow, destCol))
+    /*if(isMoveValid(board, srcCol, srcRow, destCol, destRow))
     {
-        uint8_t selectedType = board->board[srcCol][srcRow].type;
-        uint8_t selectedTeam = board->board[srcCol][srcRow].team;
+        uint8_t selectedType = board->board[srcRow][srcCol].type;
+        uint8_t selectedTeam = board->board[srcRow][srcCol].team;
 
-        board->board[srcCol][srcRow].type = EMPTY;
-        board->board[srcCol][srcRow].team = NONE;
+        board->board[srcRow][srcCol].type = EMPTY;
+        board->board[srcRow][srcCol].team = NONE;
 
-        board->board[destCol][destRow].type = selectedType;
-        board->board[destCol][destRow].team = selectedTeam;
+        board->board[destRow][destCol].type = selectedType;
+        board->board[destRow][destCol].team = selectedTeam;
+
+        int temp = currentTurn;
+        currentTurn = nextTurn;
+        nextTurn = temp;
+
+    }*/
+
+    if(isMoveValid(board, srcCol, srcRow, destCol, destRow))
+    {
+        Board testBoard = *board;
+
+        uint8_t temp_whiteKingRow = whiteKingRow;
+        uint8_t temp_whiteKingCol = whiteKingCol;
+        uint8_t temp_blackKingRow = blackKingRow;
+        uint8_t temp_blackKingCol = blackKingCol;
+
+        uint8_t selectedType = testBoard.board[srcRow][srcCol].type;
+        uint8_t selectedTeam = testBoard.board[srcRow][srcCol].team;
+
+        testBoard.board[srcRow][srcCol].type = EMPTY;
+        testBoard.board[srcRow][srcCol].team = NONE;
+
+        testBoard.board[destRow][destCol].type = selectedType;
+        testBoard.board[destRow][destCol].team = selectedTeam;
+
+        if(selectedType == KING)
+        {
+            if(selectedTeam == WHITE)
+            {
+                whiteKingRow = destRow;
+                whiteKingCol = destCol;
+            }
+            else if(selectedTeam == BLACK)
+            {
+                blackKingRow = destRow;
+                blackKingCol = destCol;
+            }
+        }
+
+        setControlledCells(&testBoard);
+
+        printBoard(testBoard.board);
+
+        if((currentTurn == WHITE && testBoard.board[whiteKingRow][whiteKingCol].controlledByBlack) || (currentTurn == BLACK && testBoard.board[blackKingRow][blackKingCol].controlledByWhite))
+        {
+            whiteKingRow = temp_whiteKingRow;
+            whiteKingCol = temp_whiteKingCol;
+            blackKingRow = temp_blackKingRow;
+            blackKingCol = temp_blackKingCol;
+            return;
+        }
+        
+        *board = testBoard;
 
         int temp = currentTurn;
         currentTurn = nextTurn;
         nextTurn = temp;
 
     }
+
 }
 
 uint8_t isMoveValid(Board* board, int srcCol, int srcRow, int destCol, int destRow)
