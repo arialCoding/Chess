@@ -35,10 +35,20 @@ target_include_directories(Chess PUBLIC ${includeDir})
 target_link_libraries(Chess PUBLIC ${DEPENDENCIES_LINK_LIBS} ${LOCAL_LINK_LIBS})
 
 set (resources_dir ${sourceDir}/resource)
-set (destination_dir ${CMAKE_CURRENT_SOURCE_DIR}/build)
 
 add_custom_command(
     TARGET Chess POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_directory ${resources_dir} ${destination_dir}/resource
+    COMMAND ${CMAKE_COMMAND} -E copy_directory ${resources_dir} ${CMAKE_BINARY_DIR}/resource
     COMMENT "Copying resources"
 )
+
+if(WIN32)
+
+add_custom_command(
+    TARGET Chess POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy ${SDL2_dir}/bin/SDL2.dll ${CMAKE_BINARY_DIR}
+    COMMAND ${CMAKE_COMMAND} -E copy ${SDL2_dir}/bin/SDL2_image.dll ${CMAKE_BINARY_DIR}
+    COMMENT "getting DLLs"
+)
+
+endif()
