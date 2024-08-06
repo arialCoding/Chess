@@ -24,5 +24,6 @@ void knightSetControlledSquares(Board* board, teams team, int pieceCol, int piec
 void bichopSetControlledSquares(Board* board, teams team, int pieceCol, int pieceRow);//////DONE//////
 void rookSetControlledSquares(Board* board, teams team, int pieceCol, int pieceRow);//////DONE//////
 
+uint8_t testForCheckMate(Board* board);
 
 #endif //LOGIC_H

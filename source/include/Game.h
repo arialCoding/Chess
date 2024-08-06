@@ -36,6 +36,12 @@ typedef struct
     SDL_Rect boardSrc;
 
     Cell board[8][8];
+
+    uint8_t whiteKingRow, whiteKingCol;
+    uint8_t blackKingRow, blackKingCol;
+
+    int currentTurn;
+    int nextTurn;
 }Board;
 
 void initBoard(Board* board, Handler* handler);

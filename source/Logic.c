@@ -1,11 +1,5 @@
 #include "Logic.h"
 
-int currentTurn = WHITE; 
-int nextTurn = BLACK; 
-
-uint8_t whiteKingRow = 7, whiteKingCol = 4;
-uint8_t blackKingRow = 0, blackKingCol = 4;
-
 static void printBoard(Cell board[8][8])
 {
     system("cls");
@@ -31,10 +25,10 @@ void handleMovement(Board* board, int mousePressedX, int mousePressedY, int mous
     {
         Board testBoard = *board;
 
-        uint8_t temp_whiteKingRow = whiteKingRow;
-        uint8_t temp_whiteKingCol = whiteKingCol;
-        uint8_t temp_blackKingRow = blackKingRow;
-        uint8_t temp_blackKingCol = blackKingCol;
+        uint8_t temp_whiteKingRow = board->whiteKingRow;
+        uint8_t temp_whiteKingCol = board->whiteKingCol;
+        uint8_t temp_blackKingRow = board->blackKingRow;
+        uint8_t temp_blackKingCol = board->blackKingCol;
 
         uint8_t selectedType = testBoard.board[srcRow][srcCol].type;
         uint8_t selectedTeam = testBoard.board[srcRow][srcCol].team;
@@ -49,34 +43,32 @@ void handleMovement(Board* board, int mousePressedX, int mousePressedY, int mous
         {
             if(selectedTeam == WHITE)
             {
-                whiteKingRow = destRow;
-                whiteKingCol = destCol;
+                board->whiteKingRow = destRow;
+                board->whiteKingCol = destCol;
             }
             else if(selectedTeam == BLACK)
             {
-                blackKingRow = destRow;
-                blackKingCol = destCol;
+                board->blackKingRow = destRow;
+                board->blackKingCol = destCol;
             }
         }
 
         setControlledCells(&testBoard);
 
-        printBoard(testBoard.board);
-
-        if((currentTurn == WHITE && testBoard.board[whiteKingRow][whiteKingCol].controlledByBlack) || (currentTurn == BLACK && testBoard.board[blackKingRow][blackKingCol].controlledByWhite))
+        if((board->currentTurn == WHITE && testBoard.board[board->whiteKingRow][board->whiteKingCol].controlledByBlack) || (board->currentTurn == BLACK && testBoard.board[board->blackKingRow][board->blackKingCol].controlledByWhite))
         {
-            whiteKingRow = temp_whiteKingRow;
-            whiteKingCol = temp_whiteKingCol;
-            blackKingRow = temp_blackKingRow;
-            blackKingCol = temp_blackKingCol;
+            board->whiteKingRow = temp_whiteKingRow;
+            board->whiteKingCol = temp_whiteKingCol;
+            board->blackKingRow = temp_blackKingRow;
+            board->blackKingCol = temp_blackKingCol;
             return;
         }
         
         *board = testBoard;
 
-        int temp = currentTurn;
-        currentTurn = nextTurn;
-        nextTurn = temp;
+        int temp = board->currentTurn;
+        board->currentTurn = board->nextTurn;
+        board->nextTurn = temp;
 
     }
 
@@ -90,7 +82,7 @@ uint8_t isMoveValid(Board* board, int srcCol, int srcRow, int destCol, int destR
         return 0;
 
     //moving opponent's piece
-    if(board->board[srcRow][srcCol].team != currentTurn)
+    if(board->board[srcRow][srcCol].team != board->currentTurn)
         return 0;
 
     switch (board->board[srcRow][srcCol].type)
@@ -178,7 +170,7 @@ uint8_t pawnMoveValid(Board* board, int srcCol, int srcRow, int destCol, int des
     {
         if((board->board[srcRow][srcCol].team == WHITE && srcRow == 6) || (board->board[srcRow][srcCol].team == BLACK && srcRow == 1))
         {
-            if(srcCol == destCol && abs(destRow - srcRow) == 2)//allow 2 squares at first move
+            if(srcCol == destCol && abs(destRow - srcRow) == 2 && board->board[srcRow + (destRow - srcRow)][srcCol].type == EMPTY)//allow 2 squares at first move
                 return 1;
         }
         
@@ -215,11 +207,6 @@ uint8_t pawnMoveValid(Board* board, int srcCol, int srcRow, int destCol, int des
 uint8_t kingMoveValid(Board* board, int srcCol, int srcRow, int destCol, int destRow)
 {
     //printf("called king\n");
-    //cant move into check (doesn't cover everything)
-    if( (board->board[destRow][destCol].controlledByWhite && board->board[srcRow][srcCol].team == BLACK) ||
-        (board->board[destRow][destCol].controlledByBlack && board->board[srcRow][srcCol].team == WHITE))
-        return 0;
-
     //can only move one square
     if(abs(destCol - srcCol) <= 1 && abs(destRow - srcRow) <= 1)
         return 1;    
@@ -595,16 +582,66 @@ void rookSetControlledSquares(Board* board, teams team, int pieceCol, int pieceR
 
 }
 
-/*static const int8_t knightMoves[8][2] = {
-        { 2,  1},//bottom right
-        { 1,  2},//corners
 
-        { 2, -1},//top right
-        { 1, -2},//corners
+uint8_t testForCheckMate(Board* board)
+{
+    for(int row = 0; row < 8; row++)
+    {
+        for(int col = 0; col < 8; col++)
+        {
+            if(board->board[row][col].type != EMPTY && board->board[row][col].team == board->currentTurn)
+            {
+                for(int r = 0; r < 8; r++)
+                {
+                    for(int c = 0; c < 8; c++)
+                    { 
+                        if(isMoveValid(board, col, row, c, r))
+                        {
+                            Board testBoard = *board;
 
-        {-2,  1},//bottom left
-        {-1,  2},//corners
+                            uint8_t temp_whiteKingRow = board->whiteKingRow;
+                            uint8_t temp_whiteKingCol = board->whiteKingCol;
+                            uint8_t temp_blackKingRow = board->blackKingRow;
+                            uint8_t temp_blackKingCol = board->blackKingCol;
 
-        {-2, -1},//top left
-        {-1, -2}//corners
-};*/
+                            uint8_t selectedType = testBoard.board[row][col].type;
+                            uint8_t selectedTeam = testBoard.board[row][col].team;
+
+                            testBoard.board[row][col].type = EMPTY;
+                            testBoard.board[row][col].team = NONE;
+
+                            testBoard.board[r][c].type = selectedType;
+                            testBoard.board[r][c].team = selectedTeam;
+
+                            if(selectedType == KING)
+                            {
+                                if(selectedTeam == WHITE)
+                                {
+                                    board->whiteKingRow = r;
+                                    board->whiteKingCol = c;
+                                }
+                                else if(selectedTeam == BLACK)
+                                {
+                                    board->blackKingRow = r;
+                                    board->blackKingCol = c;
+                                }
+                            }
+
+                            setControlledCells(&testBoard);
+
+                            if((board->currentTurn == WHITE && testBoard.board[board->whiteKingRow][board->whiteKingCol].controlledByBlack) || (board->currentTurn == BLACK && testBoard.board[board->blackKingRow][board->blackKingCol].controlledByWhite))
+                            {
+                                board->whiteKingRow = temp_whiteKingRow;
+                                board->whiteKingCol = temp_whiteKingCol;
+                                board->blackKingRow = temp_blackKingRow;
+                                board->blackKingCol = temp_blackKingCol;
+                                continue;
+                            }else return 0;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return 1;
+}

@@ -72,6 +72,14 @@ void resetBoard(Board* board)
         board->board[7][i].team = WHITE;
     }
     
+    board->whiteKingRow = 7;
+    board->whiteKingCol = 4;
+
+    board->blackKingRow = 0;
+    board->blackKingCol = 4;
+
+    board->currentTurn = WHITE;
+    board->nextTurn = BLACK;
 
 /*///////////////////debugging pieces logic///////////////////////////
     board->board[4][4].type = QUEEN;
@@ -125,7 +133,24 @@ void updateBoard(Board* board, Handler* handler)
         handleMovement(board, mousePressedX, mousePressedY, mouseReleasedX, mouseReleasedY);
     
         setControlledCells(board);
-        //printBoard(board->board);
+
+        if(board->currentTurn == WHITE && board->board[board->whiteKingRow][board->whiteKingCol].controlledByBlack)
+        {
+            printf("check");
+            if(testForCheckMate(board))
+                printf("mate\tblack won!\n");
+            else
+                printf("\n");
+        }
+        else if(board->currentTurn == BLACK && board->board[board->blackKingRow][board->blackKingCol].controlledByWhite)
+        {
+            printf("check");
+            if(testForCheckMate(board))
+                printf("mate\twhite won!\n");
+            else
+                printf("\n");
+        }
+
     }
 
 
